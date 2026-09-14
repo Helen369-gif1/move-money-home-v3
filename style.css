@@ -77,16 +77,16 @@ body {
 .video-container {
   grid-row: 1;
   grid-column: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100%;
+  width: 100%;
   pointer-events: none;
 }
 
 .video-container video {
-  height: 80vh;
-  width: auto;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ── Chapters ──
@@ -173,8 +173,5 @@ body {
     justify-content: center;
     text-align: center;
     padding: 0 24px;
-  }
-  .video-container video {
-    height: 55vh;
   }
 }

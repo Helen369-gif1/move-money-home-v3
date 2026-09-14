@@ -5,13 +5,14 @@
 
   let videoDuration = 0;
   let videoReady = false;
+  let latestProgress = 0;
 
   // ── Load video as blob ──
-  // Fetching the entire file into memory guarantees every frame
-  // is available for instant seeking. preload="auto" is just a
-  // hint that browsers often ignore for large files.
+  // Fetching the entire file into memory guarantees it's fully buffered
+  // before scrubbing starts. preload="auto" is just a hint that browsers
+  // often ignore for large files.
 
-  fetch('video5')
+  fetch('video5.mp4')
     .then(r => r.blob())
     .then(blob => {
       video.src = URL.createObjectURL(blob);
@@ -92,13 +93,7 @@
 
   function update() {
     const progress = getProgress();
-
-    // Scrub video — the video is re-encoded with every frame as
-    // a keyframe (-g 1) so any currentTime seek is instant.
-    if (videoReady) {
-      video.currentTime = progress * videoDuration;
-    }
-
+    latestProgress = progress;
     chapters.forEach(ch => animateChapter(ch, progress));
   }
 
@@ -113,4 +108,22 @@
 
   window.addEventListener('scroll', onScroll, { passive: true });
   update();
+
+  // ── Video scrub loop ──
+  // Runs independently of the scroll handler, on every animation frame.
+  // Only issues a new seek once the previous one has finished (!video.seeking) —
+  // requesting currentTime faster than the browser can seek just queues up
+  // and causes visible jitter, so this always seeks toward the latest
+  // scroll progress rather than replaying every intermediate value.
+
+  function videoLoop() {
+    if (videoReady && !video.seeking) {
+      const target = latestProgress * videoDuration;
+      if (Math.abs(video.currentTime - target) > 1 / 24) {
+        video.currentTime = target;
+      }
+    }
+    requestAnimationFrame(videoLoop);
+  }
+  requestAnimationFrame(videoLoop);
 })();
