@@ -59,7 +59,7 @@ body {
 /* 700vh = the scroll runway. You scroll through this tall box
    while the sticky child stays pinned on screen. */
 .chapters-wrapper {
-  height: 700vh;
+  height: 300vh;
 }
 
 /* Sticky viewport — stays pinned at top:0 while you scroll
